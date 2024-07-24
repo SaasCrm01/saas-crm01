@@ -12,11 +12,18 @@ export default function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) {
       alert(error.message);
     } else {
-      router.push('/login');
+      // Save user details in the database
+      const user = data.user;
+      if (user) {
+        await supabase.from('User').insert([
+          { email: user.email }
+        ]);
+        router.push('/login');
+      }
     }
   };
 
@@ -46,9 +53,7 @@ export default function Register() {
             required
           />
         </div>
-        <button type="submit" className="btn btn-primary">
-          Register
-        </button>
+        <button type="submit" className="btn btn-primary">Register</button>
       </form>
     </div>
   );

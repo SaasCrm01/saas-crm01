@@ -1,9 +1,11 @@
 /* src/app/layout.tsx */
+"use client";  // Adicione esta linha
 
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import Navbar from './components/Navbar';
+import { usePathname } from 'next/navigation';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -17,6 +19,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
   return (
     <html lang="en">
       <head>
@@ -24,7 +28,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <div className="d-flex">
-          <Navbar />
+          {pathname !== '/login' && pathname !== '/register' && pathname !== '/' && <Navbar />}
           <main className="main-content flex-grow-1 p-4">{children}</main>
         </div>
       </body>
