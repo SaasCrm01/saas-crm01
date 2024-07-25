@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import ClientRegistrationsChart from '../components/ClientRegistrationsChart';
 import SellerRegistrationsChart from '../components/SellerRegistrationsChart';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function Dashboard() {
   const [clientCount, setClientCount] = useState<number | null>(null);
@@ -38,16 +39,16 @@ export default function Dashboard() {
     <div className="container mt-5">
       <h1 className="mb-4">Dashboard</h1>
       <div className="row">
-        <div className="col-md-6">
-          <div className="card">
+        <div className="col-12 col-md-6 mb-4">
+          <div className="card h-100">
             <div className="card-body">
               <h5 className="card-title">Número de Clientes</h5>
               <p className="card-text">{clientCount !== null ? clientCount : 'Carregando...'}</p>
             </div>
           </div>
         </div>
-        <div className="col-md-6">
-          <div className="card">
+        <div className="col-12 col-md-6 mb-4">
+          <div className="card h-100">
             <div className="card-body">
               <h5 className="card-title">Número de Vendedores</h5>
               <p className="card-text">{sellerCount !== null ? sellerCount : 'Carregando...'}</p>
@@ -56,13 +57,21 @@ export default function Dashboard() {
         </div>
       </div>
       <div className="row mt-4">
-        <div className="col-md-6">
-          <h5>Client Registrations by Day</h5>
-          <ClientRegistrationsChart />
+        <div className="col-12 mb-4">
+          <div className="card">
+            <div className="card-body">
+              <h5>Client Registrations by Day</h5>
+              <ClientRegistrationsChart />
+            </div>
+          </div>
         </div>
-        <div className="col-md-6">
-          <h5>Seller Registrations by Day</h5>
-          <SellerRegistrationsChart />
+        <div className="col-12 mb-4">
+          <div className="card">
+            <div className="card-body">
+              <h5>Seller Registrations by Day</h5>
+              <SellerRegistrationsChart />
+            </div>
+          </div>
         </div>
       </div>
     </div>
