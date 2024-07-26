@@ -1,4 +1,3 @@
-// src/app/register/page.tsx
 'use client';
 
 import { useState } from 'react';
@@ -14,18 +13,40 @@ export default function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) {
-      alert(error.message);
-    } else {
-      // Save user details in the database
-      const user = data.user;
-      if (user) {
-        await supabase.from('User').insert([
-          { email: user.email }
-        ]);
-        router.push('/login');
+
+    try {
+      console.log('Attempting to register user with email:', email);
+
+      const { data, error } = await supabase.auth.signUp({ email, password });
+
+      if (error) {
+        if (error.message.includes('rate limit')) {
+          alert('You have exceeded the number of registration attempts. Please try again later.');
+        } else {
+          console.error('Error during signUp:', error);
+          alert(error.message);
+        }
+      } else {
+        const user = data.user;
+        console.log('User registered:', user);
+
+        if (user) {
+          const { data: insertData, error: insertError } = await supabase
+            .from('User')
+            .insert([{ email: user.email }]);
+
+          if (insertError) {
+            console.error('Error inserting user into database:', insertError);
+            alert(insertError.message);
+          } else {
+            console.log('User inserted into database:', insertData);
+            router.push('/login');
+          }
+        }
       }
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      alert('An unexpected error occurred. Please try again later.');
     }
   };
 

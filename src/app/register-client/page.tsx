@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import ClientTable from '../components/ClientTable';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 type Client = {
   id: number;

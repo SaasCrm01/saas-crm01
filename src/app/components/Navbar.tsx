@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { FaTachometerAlt, FaUser, FaClipboardList, FaBell, FaHeart, FaWallet, FaMoon, FaSun, FaBars } from 'react-icons/fa';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Navbar = () => {
   const pathname = usePathname();
