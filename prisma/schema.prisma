@@ -9,10 +9,15 @@ generator client {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
+  id        Int                @id @default(autoincrement())
+  email     String             @unique
   name      String?
-  createdAt DateTime @default(now())
+  createdAt DateTime           @default(now())
+  clients   Client[]
+  sellers   Seller[]
+  sales     Sale[]
+  performances SellerPerformance[]
+  growths   ClientGrowth[]
 }
 
 model Client {
@@ -21,8 +26,9 @@ model Client {
   email     String
   phone     String
   createdAt DateTime      @default(now())
+  userId    Int
+  user      User          @relation(fields: [userId], references: [id])
   sellers   ClientSeller[]
-
 }
 
 model Seller {
@@ -31,8 +37,9 @@ model Seller {
   email     String
   phone     String
   createdAt DateTime      @default(now())
+  userId    Int
+  user      User          @relation(fields: [userId], references: [id])
   clients   ClientSeller[]
-
 }
 
 model ClientSeller {
@@ -45,19 +52,25 @@ model ClientSeller {
 }
 
 model Sale {
-  id     Int      @id @default(autoincrement())
-  month  String
-  sales  Int
+  id        Int      @id @default(autoincrement())
+  month     String
+  sales     Int
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model SellerPerformance {
   id          Int      @id @default(autoincrement())
   name        String
   performance Int
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
 }
 
 model ClientGrowth {
-  id    Int    @id @default(autoincrement())
-  name  String
-  value Int
+  id      Int    @id @default(autoincrement())
+  name    String
+  value   Int
+  userId  Int
+  user    User   @relation(fields: [userId], references: [id])
 }

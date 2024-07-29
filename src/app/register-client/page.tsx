@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import ClientTable from '../components/ClientTable';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { supabase } from '../../lib/supabase';
 
 type Client = {
   id: number;
@@ -19,20 +20,30 @@ export default function RegisterClient() {
   });
 
   const [clients, setClients] = useState<Client[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchClients();
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (data.user) {
+        setUserId(data.user.id);
+        fetchClients(data.user.id);
+      } else {
+        console.error('User not authenticated', error);
+      }
+    };
+    fetchUser();
   }, []);
 
-  const fetchClients = async () => {
+  const fetchClients = async (userId: string) => {
     try {
-      const response = await fetch('/api');
+      const response = await fetch('/api/clients', {
+        headers: {
+          'user-id': userId,
+        },
+      });
       const data = await response.json();
-      if (Array.isArray(data)) {
-        setClients(data);
-      } else {
-        setClients([]);
-      }
+      setClients(data);
     } catch (error) {
       console.error('Failed to fetch clients:', error);
       setClients([]);
@@ -49,10 +60,12 @@ export default function RegisterClient() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const response = await fetch('/api', {
+    if (!userId) return;
+    const response = await fetch('/api/clients', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'user-id': userId,
       },
       body: JSON.stringify(formData),
     });
@@ -60,7 +73,7 @@ export default function RegisterClient() {
     if (response.ok) {
       alert('Client registered successfully!');
       setFormData({ name: '', email: '', phone: '' });
-      fetchClients();
+      fetchClients(userId);
     } else {
       alert('Failed to register client.');
     }
@@ -107,8 +120,8 @@ export default function RegisterClient() {
         </div>
         <button type="submit" className="btn btn-primary">Registrar</button>
       </form>
-      <div className="pt-3 pb-3 ">
-      <ClientTable clients={clients} />
+      <div className="pt-3 pb-3">
+        <ClientTable clients={clients} />
       </div>
     </div>
   );

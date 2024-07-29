@@ -4,9 +4,19 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const userId = req.headers['user-id'] as string;
+
+  if (!userId) {
+    return res.status(401).json({ error: 'User ID is required' });
+  }
+
   if (req.method === 'GET') {
     try {
-      const sellers = await prisma.seller.findMany();
+      const sellers = await prisma.seller.findMany({
+        where: {
+          userId: parseInt(userId),
+        },
+      });
       res.status(200).json(sellers);
     } catch (error) {
       res.status(500).json({ error: 'Error fetching sellers' });
@@ -20,6 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           name,
           email,
           phone,
+          userId: parseInt(userId),
         },
       });
       res.status(201).json(seller);

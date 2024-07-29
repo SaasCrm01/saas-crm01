@@ -4,12 +4,21 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const userId = req.headers['user-id'] as string;
+
+  if (!userId) {
+    return res.status(401).json({ error: 'User ID is required' });
+  }
+
   if (req.method === 'GET') {
     try {
-      const clients = await prisma.client.findMany();
+      const clients = await prisma.client.findMany({
+        where: {
+          userId: parseInt(userId),
+        },
+      });
       res.status(200).json(clients);
     } catch (error) {
-      console.error('Error fetching clients:', error);
       res.status(500).json({ error: 'Error fetching clients' });
     }
   } else if (req.method === 'POST') {
@@ -21,6 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           name,
           email,
           phone,
+          userId: parseInt(userId),
         },
       });
       res.status(201).json(client);
@@ -28,7 +38,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(500).json({ error: 'Error creating client' });
     }
   } else {
-    res.setHeader('Allow', ['GET', 'POST']);
     res.status(405).json({ error: 'Method not allowed' });
   }
 }

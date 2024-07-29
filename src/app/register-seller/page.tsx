@@ -1,8 +1,8 @@
-// src/app/register-seller/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import SellerTable from '../components/SellerTable';
+import { supabase } from '../../lib/supabase';
 
 type Seller = {
   id: number;
@@ -19,14 +19,28 @@ export default function RegisterSeller() {
   });
 
   const [sellers, setSellers] = useState<Seller[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchSellers();
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (data.user) {
+        setUserId(data.user.id);
+        fetchSellers(data.user.id);
+      } else {
+        console.error('User not authenticated', error);
+      }
+    };
+    fetchUser();
   }, []);
 
-  const fetchSellers = async () => {
+  const fetchSellers = async (userId: string) => {
     try {
-      const response = await fetch('/api/sellers');
+      const response = await fetch('/api/sellers', {
+        headers: {
+          'user-id': userId,
+        },
+      });
       const data = await response.json();
       setSellers(data);
     } catch (error) {
@@ -44,10 +58,12 @@ export default function RegisterSeller() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!userId) return;
     const response = await fetch('/api/sellers', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'user-id': userId,
       },
       body: JSON.stringify(formData),
     });
@@ -55,7 +71,7 @@ export default function RegisterSeller() {
     if (response.ok) {
       alert('Seller registered successfully!');
       setFormData({ name: '', email: '', phone: '' });
-      fetchSellers();
+      fetchSellers(userId);
     } else {
       alert('Failed to register seller.');
     }
