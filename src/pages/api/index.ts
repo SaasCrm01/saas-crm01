@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(500).json({ error: 'Error fetching clients' });
     }
   } else if (req.method === 'POST') {
-    const { name, email, phone } = req.body;
+    const { name, email, phone, user } = req.body;
 
     try {
       const client = await prisma.client.create({
@@ -20,6 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           name,
           email,
           phone,
+          user, // Ensure 'user' is included in the request body
         },
       });
       res.status(201).json(client);
